@@ -24,7 +24,6 @@ from audioio import AudioOut
 import board
 from digitalio import DigitalInOut, Direction, Pull
 import math
-from microcontroller import reset
 import neopixel
 from rainbowio import colorwheel
 import time
@@ -48,7 +47,6 @@ btnB.pull = Pull.DOWN
 temp = Thermistor(
     board.TEMPERATURE, 10000, 10000, 25, 3950
     )
-
 # Define audio
 speaker_enable = DigitalInOut(board.SPEAKER_ENABLE)
 speaker_enable.switch_to_output(value=True)
@@ -181,10 +179,6 @@ def check_temp():
         dac.stop()
 
 while True:
-    # periodically reset board for more accurate time
-    if btnB.value:
-        reset()
-
     pixels.fill(JADE)
     pixels.show()
     gc.collect()

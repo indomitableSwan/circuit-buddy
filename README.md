@@ -18,7 +18,7 @@ Current features:
 Some features will probably change; it's a mix between dev convenience and intended functionality right now. Currently:
 - A good signal that the board is working is if the neopixels are jade in color. From here you can:
     - Press Button A to start a session flow.
-    - Press Button B to restart the board. It's a good idea to do this after each session flow, because time drifts! This is a fundamental constraint of the hardware.
+    - Press the reset button to restart the board. It's a good idea to do this after each session flow, because time drifts! This is a fundamental constraint of the hardware.
 - Go back to the main display at any time by pressing Button A. This may change because it's useful for development, but allows you to skip Move/Rest subsessions.
 - Skip ahead from a Focus subsession to Move or Rest (depending on where you are in the flow) by pressing Button B.
 - Restart a Move or Rest subsession by pressing Button B. 
