@@ -27,6 +27,7 @@ import math
 import neopixel
 from rainbowio import colorwheel
 import time
+import analogio
 gc.collect()
 
 pixels = neopixel.NeoPixel(board.NEOPIXEL, 10, brightness = 0.05, auto_write=False)
@@ -47,6 +48,9 @@ btnB.pull = Pull.DOWN
 temp = Thermistor(
     board.TEMPERATURE, 10000, 10000, 25, 3950
     )
+
+light = analogio.AnalogIn(board.LIGHT)
+
 # Define audio
 speaker_enable = DigitalInOut(board.SPEAKER_ENABLE)
 speaker_enable.switch_to_output(value=True)
@@ -61,8 +65,8 @@ JADE= (0, 255, 40)
 
 # (sub)session lengths
 FOCUS = 20 * 60
-SHORT_BREAK = .5 * 60
-LONG_BREAK = .5 * 60
+SHORT_BREAK = 5 * 60
+LONG_BREAK = 15 * 60
 
 global restart
 restart = False
@@ -178,6 +182,10 @@ def check_temp():
         time.sleep(1)
         dac.stop()
 
+def check_light():
+    print((light.value, ))
+    time.sleep(0.1)
+
 while True:
     pixels.fill(JADE)
     pixels.show()
@@ -186,8 +194,9 @@ while True:
     if switch.value: # left is true
         check_temp()
 
-    gc.collect()
+    check_light()
 
+    gc.collect()
     if btnA.value:
         time.sleep(.5)
         session(30, 20, 20)
