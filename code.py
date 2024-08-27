@@ -2,6 +2,7 @@
 #
 # This code borrows from:
 # Adafruit's adafruit_circuitplayground/circuit_playground_base.py
+# SPDX-FileCopyrightText: 2016 Scott Shawcroft for Adafruit Industries
 # SPDX-FileCopyrightText: 2017-2019 Kattni Rembor for Adafruit Industries
 # SPDX-FileCopyrightText: 2022 Ryan Keith for Adafruit Industries
 #
