@@ -9,8 +9,8 @@ Current features:
 - _Quasi pomodoro timer_: Divides your session into parts and gives you a visual display of the passing time and session flow using the onboard neopixels. The session types are as follows:
     - Go Chasing Rainbows: When Button A is pressed, a rainbow chase animation is briefly displayed to allow you to settle in to focus.
     - Focus: The board will slowly cycle through colors of the rainbow. The default time is set to 20 minutes.
-    - Move: The board will display a pinkish color until the subsession is almost done, when the color will switch to a bluish teal. Take a break, get up and move! The default time is set to 5 minutes.
-    - Rest: The board will display a whitish color until the subsession is almost done, when the color will switch to blue. Take a longer break, move more, go do your laundry or get lunch started! The default time is 15 minutes.
+    - Move: The board will display an off-white color until the subsession is almost done, when the color will switch to blue. Take a break, get up and move! The default time is set to 7 minutes.
+    - Rest: The board will display a bluish teal color until the subsession is almost done, when the color will switch to pinkish. Take a longer break, move more, go do your laundry or get lunch started! The default time is 15 minutes.
     
     The session flow is: Chasing Rainbows, Focus, Move, Focus, Move, Focus, Move, Focus, Rest.
 

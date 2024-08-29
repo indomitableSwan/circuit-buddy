@@ -30,6 +30,7 @@ from rainbowio import colorwheel
 import time
 import analogio
 gc.collect()
+print(gc.mem_free())
 
 pixels = neopixel.NeoPixel(board.NEOPIXEL, 10, brightness = 0.05, auto_write=False)
 
@@ -66,7 +67,7 @@ JADE= (0, 255, 40)
 
 # (sub)session lengths
 FOCUS = 20 * 60
-SHORT_BREAK = 5 * 60
+SHORT_BREAK = 7 * 60
 LONG_BREAK = 15 * 60
 
 global restart
@@ -114,10 +115,8 @@ def rest(length, color0=OLD_LACE, color1=BLUE):
             time.sleep(.5)
             start = time.monotonic()
         if time.monotonic() + 15 < start + length:
-
             pixels.fill(color0)
             pixels.show()
-
         else:  # warn rest almost over
             pixels.fill(color1)
             pixels.show()
@@ -162,12 +161,12 @@ def session(focus = FOCUS, short_b = SHORT_BREAK, long_b = LONG_BREAK):
 
         if i < 3:
             print("starting short break session")
-            if rest(SHORT_BREAK, PINKISH, BLUEISH):
+            if rest(SHORT_BREAK):
                 return # restart
             gc.collect()
         else:
             print("starting long break session")
-            if rest(LONG_BREAK):
+            if rest(LONG_BREAK, BLUEISH, PINKISH):
                 return # restart
             gc.collect()
 
@@ -183,10 +182,6 @@ def check_temp():
         time.sleep(1)
         dac.stop()
 
-def check_light():
-    print((light.value, ))
-    time.sleep(0.1)
-
 while True:
     pixels.fill(JADE)
     pixels.show()
@@ -194,13 +189,11 @@ while True:
 
     if switch.value: # left is true
         check_temp()
-
-    check_light()
-
     gc.collect()
+
     if btnA.value:
         time.sleep(.5)
-        session(30, 20, 20)
+        session()
         gc.collect()
 
 
