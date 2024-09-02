@@ -2,7 +2,7 @@
 
 CircuitBuddy helps you be mindful of your environment and wellness while still allowing you to focus on projects. This is built with my specific use case in mind; please feel free to make your own modifications.
 
-The code is designed to run on the [CircuitPlayground Express](https://learn.adafruit.com/adafruit-circuit-playground-express/frequently-asked-questions). Adafruit provides a very good guide to getting your hardware setup with the code loaded, so I won't repeat those instructions here.
+The code is designed to run on the [Circuit Playground Express](https://learn.adafruit.com/adafruit-circuit-playground-express/) and the [CircuitPlayground Bluefruit](https://learn.adafruit.com/adafruit-circuit-playground-bluefruit/). Adafruit provides a very good guide to getting your hardware setup with the code loaded, so I won't repeat those instructions here.
 
 Current features:
 - _Temperature alerts_: If the board's switch is set to "true" (left) and the onboard temperature sensor reads below 62 Fahrenheit ("Go put on socks!") or above 90 Fahrenheit ("You forgot to turn on the AC!"), the board plays an audio alert. The audio quality is suprememly irritating, so first flip the switch to false (right) and then address the problem.
