@@ -19,9 +19,8 @@
 import gc
 from adafruit_led_animation.animation.rainbow import Rainbow
 from adafruit_thermistor import Thermistor
-import array # freeish
+import array
 from audiocore import RawSample
-from audioio import AudioOut
 import board
 from digitalio import DigitalInOut, Direction, Pull
 import math
@@ -29,8 +28,14 @@ import neopixel
 from rainbowio import colorwheel
 import time
 import analogio
+import sys
+
+if sys.platform == "nRF52840":
+    from audiopwmio import PWMAudioOut as AudioOut
+elif sys.platform == "Atmel SAMD21":
+    from audioio import AudioOut
+
 gc.collect()
-print(gc.mem_free())
 
 pixels = neopixel.NeoPixel(board.NEOPIXEL, 10, brightness = 0.05, auto_write=False)
 
