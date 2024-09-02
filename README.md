@@ -23,6 +23,11 @@ Some features will probably change; it's a mix between dev convenience and inten
 - Skip ahead from a Focus subsession to Move or Rest (depending on where you are in the flow) by pressing Button B.
 - Restart a Move or Rest subsession by pressing Button B. 
 
+# Dependencies
+-  adafruit_thermistor.mpy
+-  neopixel.mpy
+-  adafruit_led_animation
+
 # Contributions, Licenses, etc.
 
 [SPDX MIT license](https://spdx.org/licenses/MIT.html) applies. Contributions are welcome. 
