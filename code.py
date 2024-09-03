@@ -160,18 +160,18 @@ def session(focus = FOCUS, short_b = SHORT_BREAK, long_b = LONG_BREAK):
         gc.collect()
 
         print("starting focus session")
-        if focus_session(FOCUS):
+        if focus_session(focus):
             return # restart
         gc.collect()
 
         if i < 3:
             print("starting short break session")
-            if rest(SHORT_BREAK):
+            if rest(length=short_b):
                 return # restart
             gc.collect()
         else:
             print("starting long break session")
-            if rest(LONG_BREAK, BLUEISH, PINKISH):
+            if rest(long_b, BLUEISH, PINKISH):
                 return # restart
             gc.collect()
 
