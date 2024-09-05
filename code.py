@@ -18,6 +18,7 @@
 # SPDX-License-Identifier: MIT
 import gc
 from adafruit_led_animation.animation.rainbow import Rainbow
+from adafruit_led_animation.color import calculate_intensity
 from adafruit_thermistor import Thermistor
 import array
 from audiocore import RawSample
@@ -110,6 +111,7 @@ def rest(length, color0=OLD_LACE, color1=BLUE):
     start = time.monotonic()
 
     while time.monotonic() < start + length:
+        intensity = .45*math.sin(1.25*time.monotonic())+.55
         if switch.value:
             check_temp()
 
@@ -120,10 +122,10 @@ def rest(length, color0=OLD_LACE, color1=BLUE):
             time.sleep(.5)
             start = time.monotonic()
         if time.monotonic() + 15 < start + length:
-            pixels.fill(color0)
+            pixels.fill(calculate_intensity(color0, intensity))
             pixels.show()
         else:  # warn rest almost over
-            pixels.fill(color1)
+            pixels.fill(calculate_intensity(color1, intensity))
             pixels.show()
     return False
 
