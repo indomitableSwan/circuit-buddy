@@ -79,9 +79,9 @@ LONG_BREAK = 15 * 60
 global restart
 restart = False
 
-def sine():
+def sine(f):
     # Generate one period of sine wav.
-    length = 8000 // 415
+    length = 8000 // f
     sine_wave = array.array("H", [0] * length)
     for i in range(length):
         sine_wave[i] = int(math.sin(math.pi * 2 * i / length) * (2 ** 15) + 2 ** 15)
@@ -185,7 +185,7 @@ def check_temp():
         if not switch.value:
             print("temp is", temp_f)
             return
-        dac.play(sine(), loop=True)
+        dac.play(sine(415), loop=True)
         time.sleep(1)
         dac.stop()
 
