@@ -97,6 +97,8 @@ def focus_session(length):
         rainbow.animate()
         if switch.value:
             check_temp()
+            check_light()
+            gc.collect()
 
         if btnA.value: # restart
             time.sleep(.5)
@@ -114,6 +116,8 @@ def rest(length, color0=OLD_LACE, color1=BLUE):
         intensity = .45*math.sin(1.25*time.monotonic())+.55
         if switch.value:
             check_temp()
+            check_light()
+            gc.collect()
 
         if btnA.value: # restart
             time.sleep(.5)
@@ -143,6 +147,8 @@ def chasing_rainbow(length):
                 while time.monotonic() <= start_time + length/2550:
                     if switch.value:
                         check_temp()
+                        check_light()
+                        gc.collect()
 
                     if btnA.value: # restart
                         time.sleep(.5)
@@ -189,6 +195,24 @@ def check_temp():
         time.sleep(1)
         dac.stop()
 
+def check_light():
+    arr = array.array("H", [])
+    for i in range(20):
+        arr.append(light.value)
+    v = avg(arr)
+    while v < 30000:
+        if not switch.value:
+            print("light value is low:", v)
+            return
+        pixels.fill(calculate_intensity(JADE, math.sin(1.25*time.monotonic())))
+        pixels.show()
+
+def avg(arr):
+    sum = 0
+    for v in arr:
+        sum += v
+    return sum/len(arr)
+
 while True:
     pixels.fill(JADE)
     pixels.show()
@@ -196,6 +220,7 @@ while True:
 
     if switch.value: # left is true
         check_temp()
+        check_light()
     gc.collect()
 
     if btnA.value:
