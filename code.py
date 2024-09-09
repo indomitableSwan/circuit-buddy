@@ -69,11 +69,13 @@ lis3dh = adafruit_lis3dh.LIS3DH_I2C(
         )
 lis3dh.range = adafruit_lis3dh.RANGE_8_G
 
+# set sensitivity for tap detection
+# higher values are less sensitive
 def threshold():
     if sys.platform == "nRF52840":
         return 25
     elif sys.platform == "Atmel SAMD21":
-        return 15
+        return 20
     else:
         raise Exception("Platform not recognized")
 
