@@ -20,9 +20,11 @@ import gc
 from adafruit_led_animation.animation.rainbow import Rainbow
 from adafruit_led_animation.color import calculate_intensity
 from adafruit_thermistor import Thermistor
+import adafruit_lis3dh
 import array
 from audiocore import RawSample
 import board
+import busio
 from digitalio import DigitalInOut, Direction, Pull
 import math
 import neopixel
@@ -59,6 +61,31 @@ temp = Thermistor(
 
 light = analogio.AnalogIn(board.LIGHT)
 
+#accelerometer
+i2c = busio.I2C(board.ACCELEROMETER_SCL, board.ACCELEROMETER_SDA)
+int1 = DigitalInOut(board.ACCELEROMETER_INTERRUPT)
+lis3dh = adafruit_lis3dh.LIS3DH_I2C(
+        i2c, address=0x19, int1=int1
+        )
+lis3dh.range = adafruit_lis3dh.RANGE_8_G
+
+# set sensitivity for tap detection
+# higher values are less sensitive
+def threshold():
+    if sys.platform == "nRF52840":
+        return 25
+    elif sys.platform == "Atmel SAMD21":
+        return 20
+    else:
+        raise Exception("Platform not recognized")
+
+# detect double taps
+lis3dh.set_tap(
+    tap=2,
+    threshold=threshold(),
+    time_latency=50
+    )
+
 # Define audio
 speaker_enable = DigitalInOut(board.SPEAKER_ENABLE)
 speaker_enable.switch_to_output(value=True)
@@ -88,7 +115,7 @@ def sine(f):
     sine_wave = RawSample(sine_wave, sample_rate=8000)
     return sine_wave
 
-def focus_session(length):
+def focus_session(length, ctr):
     start = time.monotonic()
 
     rainbow = Rainbow(pixels, speed=0.1, period=length, precompute_rainbow=False)
@@ -107,9 +134,16 @@ def focus_session(length):
         if btnB.value: # skip to break
             time.sleep(.5)
             return False
+
+        if lis3dh.tapped:
+            print("Status check!")
+            for i in range(ctr+1):
+                pixels[i] = (255, 255, 255)
+            pixels.show()
+            time.sleep(1)
     return False
 
-def rest(length, color0=OLD_LACE, color1=BLUE):
+def rest(length, ctr=-1, color0=OLD_LACE, color1=BLUE):
     start = time.monotonic()
 
     while time.monotonic() < start + length:
@@ -125,6 +159,13 @@ def rest(length, color0=OLD_LACE, color1=BLUE):
         if btnB.value: # restart break
             time.sleep(.5)
             start = time.monotonic()
+        if lis3dh.tapped and ctr >= 0:
+            print("Status check!")
+            for i in range(ctr+1):
+                pixels[i] = (255, 0, 0)
+            pixels.show()
+            time.sleep(2)
+
         if time.monotonic() + 15 < start + length:
             pixels.fill(calculate_intensity(color0, intensity))
             pixels.show()
@@ -168,18 +209,18 @@ def session(focus = FOCUS, short_b = SHORT_BREAK, long_b = LONG_BREAK):
         gc.collect()
 
         print("starting focus session")
-        if focus_session(focus):
+        if focus_session(focus, i):
             return # restart
         gc.collect()
 
         if i < 3:
             print("starting short break session")
-            if rest(length=short_b):
+            if rest(length=short_b, ctr=i):
                 return # restart
             gc.collect()
         else:
             print("starting long break session")
-            if rest(long_b, BLUEISH, PINKISH):
+            if rest(length=long_b, color0=BLUEISH, color1=PINKISH):
                 return # restart
             gc.collect()
 
