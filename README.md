@@ -16,13 +16,19 @@ Current features:
     The session flow is: Chasing Rainbows, Focus, Move, Focus, Move, Focus, Move, Focus, Rest.
 
 # Usage, customization and caveats
-Some features will probably change; it's a mix between dev convenience and intended functionality right now. Currently:
-- A good signal that the board is working is if the neopixels are jade in color. From here you can:
+Some features will probably change; it's a mix between dev convenience and intended functionality right now. A good signal that the board is working is if the neopixels are jade in color. 
+
+From here you can:
+- _start_: Press Button A to start a session flow 
     - Press Button A to start a session flow.
-    - Press the reset button to restart the board. It's a good idea to do this after each session flow, because time drifts! This is a fundamental constraint of the hardware.
-- Go back to the main display at any time by pressing Button A. This may change because it's useful for development, but allows you to skip Move/Rest subsessions.
-- Skip ahead from a Focus subsession to Move or Rest (depending on where you are in the flow) by pressing Button B.
-- Restart a Move or Rest subsession by pressing Button B. 
+- _exit session_: Press A at any time to exit the current flow session and go back to the main display. This may change because it's useful for development, but allows you to skip Move/Rest subsessions.
+- _skip focus_: Skip ahead from a Focus subsession to Move or Rest (depending on where you are in the flow) by pressing Button B.
+- _restart_: Press Button B to restart a Move or Rest subsession.
+- _check status_: Double tap the board to check where you are in a flow during Focus and Move. If you are in the _i<sup>th</sup>_ Focus/Move subsession, _i_ neopixels (starting from the top of the board, moving counter-clockwise) will change color for a second. 
+
+Caveats and limitations:
+- _keeping time_: Press the reset button to restart the board. It's a good idea to do this after each session flow, because time drifts! This is a fundamental constraint of the hardware.
+- If the board does not respond right away, it is probably because CircuitPython doesn't allow for parallel processing. This may lead to noticeable delays in responsiveness, particularly when checking the current status.
 
 There is currently no support built in for adjusting your settings from the defaults. But you can manually change them!
 
