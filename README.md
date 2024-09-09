@@ -21,7 +21,7 @@ Some features will probably change; it's a mix between dev convenience and inten
 A good signal that the board is working is if the neopixels are jade in color. 
 
 From here you can:
-- _start_: Press Button A to start a session flow 
+- _start_: Press Button A to start a session flow.
 - _exit session_: Press Button A at any time to exit the current flow session and go back to the main display. This may change because it's useful for development, but allows you to skip Move/Rest subsessions.
 - _skip focus_: Skip ahead from a Focus subsession to Move or Rest (depending on where you are in the flow) by pressing Button B.
 - _restart_: Press Button B to restart a Move or Rest subsession.
