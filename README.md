@@ -16,7 +16,9 @@ Current features:
     The session flow is: Chasing Rainbows, Focus, Move, Focus, Move, Focus, Move, Focus, Rest.
 
 # Usage, customization and caveats
-Some features will probably change; it's a mix between dev convenience and intended functionality right now. A good signal that the board is working is if the neopixels are jade in color. 
+Some features will probably change; it's a mix between dev convenience and intended functionality right now. 
+
+A good signal that the board is working is if the neopixels are jade in color. 
 
 From here you can:
 - _start_: Press Button A to start a session flow 
