@@ -16,6 +16,7 @@
 #
 #
 # SPDX-License-Identifier: MIT
+
 import gc
 from adafruit_led_animation.animation.rainbow import Rainbow
 from adafruit_led_animation.color import calculate_intensity
@@ -37,6 +38,8 @@ if sys.platform == "nRF52840":
     from audiopwmio import PWMAudioOut as AudioOut
 elif sys.platform == "Atmel SAMD21":
     from audioio import AudioOut
+else:
+    raise Exception("Platform not recognized")
 
 gc.collect()
 
@@ -73,7 +76,7 @@ lis3dh.range = adafruit_lis3dh.RANGE_8_G
 # higher values are less sensitive
 def threshold():
     if sys.platform == "nRF52840":
-        return 25
+        return 20
     elif sys.platform == "Atmel SAMD21":
         return 20
     else:
@@ -103,9 +106,6 @@ FOCUS = 20 * 60
 SHORT_BREAK = 7 * 60
 LONG_BREAK = 15 * 60
 
-global restart
-restart = False
-
 def sine(f):
     # Generate one period of sine wav.
     length = 8000 // f
@@ -117,61 +117,79 @@ def sine(f):
 
 def focus_session(length, ctr):
     start = time.monotonic()
+    display_status = False # Boolean for status check
 
     rainbow = Rainbow(pixels, speed=0.1, period=length, precompute_rainbow=False)
 
     while time.monotonic() < start + length:
+        # Main display
         rainbow.animate()
+
+        # Check sensors
         if switch.value:
             check_temp()
             check_light()
             gc.collect()
-
         if btnA.value: # restart
+            print("Go back to main!")
             time.sleep(.5)
             return True
-
         if btnB.value: # skip to break
+            print("Skipping to break!")
             time.sleep(.5)
             return False
-
-        if lis3dh.tapped:
+        if lis3dh.tapped and ctr >= 0:
             print("Status check!")
-            for i in range(ctr+1):
-                pixels[i] = (255, 255, 255)
-            pixels.show()
-            time.sleep(1)
+            t = time.monotonic()
+            display_status = True
+
+        # Display status briefly if boolean set
+        if display_status:
+            if time.monotonic() >= t + 2:
+                display_status = False
+            else:
+                pixels[0:ctr+1] = [(255, 255, 255)]*(ctr+1)
+        pixels.show()
     return False
 
 def rest(length, ctr=-1, color0=OLD_LACE, color1=BLUE):
     start = time.monotonic()
+    display_status = False
 
     while time.monotonic() < start + length:
         intensity = .45*math.sin(1.25*time.monotonic())+.55
+
+        # Main display
+        if time.monotonic() + 15 < start + length:
+            pixels.fill(calculate_intensity(color0, intensity))
+        else:  # warn rest almost over
+            pixels.fill(calculate_intensity(color1, intensity))
+
+        # Check sensors
         if switch.value:
             check_temp()
             check_light()
             gc.collect()
-
         if btnA.value: # restart
+            print("Go back to main!")
             time.sleep(.5)
             return True
         if btnB.value: # restart break
+            print("Restarting break!")
             time.sleep(.5)
             start = time.monotonic()
         if lis3dh.tapped and ctr >= 0:
             print("Status check!")
-            for i in range(ctr+1):
-                pixels[i] = (255, 0, 0)
-            pixels.show()
-            time.sleep(2)
+            t = time.monotonic()
+            display_status = True
 
-        if time.monotonic() + 15 < start + length:
-            pixels.fill(calculate_intensity(color0, intensity))
-            pixels.show()
-        else:  # warn rest almost over
-            pixels.fill(calculate_intensity(color1, intensity))
-            pixels.show()
+        # Display status briefly if boolean set
+        if display_status:
+            if time.monotonic() >= t + 2:
+                display_status = False
+            else:
+                pixels[0:ctr+1] = [(255, 0, 0)]*(ctr+1)
+        pixels.show()
     return False
 
 def chasing_rainbow(length):
@@ -204,6 +222,7 @@ def chasing_rainbow(length):
 
 def session(focus = FOCUS, short_b = SHORT_BREAK, long_b = LONG_BREAK):
     for i in range(0,4):
+        print("chasing rainbows")
         if chasing_rainbow(5):
             return# restart
         gc.collect()
@@ -268,7 +287,3 @@ while True:
         time.sleep(.5)
         session()
         gc.collect()
-
-
-
-
