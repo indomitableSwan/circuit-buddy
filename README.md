@@ -32,7 +32,7 @@ If you are in the _i<sup>th</sup>_ Focus/Move subsession, _i_ neopixels (startin
 
 Caveats and limitations:
 - _keeping time_: Press the reset button to restart the board. It's a good idea to do this after each session flow, because time drifts! This is a fundamental constraint of the hardware.
-- There is currently no support built in for adjusting your settings from the defaults. But you can manually change them!
+- _defaults_: There is currently no support built in for adjusting your settings from the defaults. But you can manually change them!
 
 # Setting up your device
 ## Dependencies
