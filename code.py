@@ -216,7 +216,7 @@ def flow(focus = FOCUS, short_b = SHORT_BREAK, long_b = LONG_BREAK):
             print("starting rest session")
             start = time.monotonic()
             fade = Fade(length=long_b, start=start, color0=BLUEISH, color1=PINKISH)
-            if session(length=long_b, start=start, anim=fade.animate):
+            if session(length=long_b, start=start, anim=fade):
                 return # restart
             gc.collect()
 
