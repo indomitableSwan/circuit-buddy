@@ -170,9 +170,13 @@ def session(length, start, anim, ctr=-1):
             time.sleep(.5)
             return True
         if btnB.value: # skip ahead
-            print("Skipping to next session!")
             time.sleep(.5)
-            return False
+            if isinstance(anim, Fade):
+                print("Adding time to current session!")
+                start = time.monotonic()
+            else:
+                print("Skipping to next session!")
+                return False
         if lis3dh.tapped and ctr >= 0:
             print("Status check!")
             t = time.monotonic()
@@ -262,5 +266,5 @@ while True:
 
     if btnA.value:
         time.sleep(.5)
-        flow(45, 45, 45)
+        flow()
         gc.collect()
