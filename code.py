@@ -16,6 +16,7 @@
 #
 #
 # SPDX-License-Identifier: MIT
+
 import gc
 from adafruit_led_animation.animation.rainbow import Rainbow
 from adafruit_led_animation.color import calculate_intensity
@@ -37,6 +38,8 @@ if sys.platform == "nRF52840":
     from audiopwmio import PWMAudioOut as AudioOut
 elif sys.platform == "Atmel SAMD21":
     from audioio import AudioOut
+else:
+    raise Exception("Platform not recognized")
 
 gc.collect()
 
@@ -73,7 +76,7 @@ lis3dh.range = adafruit_lis3dh.RANGE_8_G
 # higher values are less sensitive
 def threshold():
     if sys.platform == "nRF52840":
-        return 25
+        return 20
     elif sys.platform == "Atmel SAMD21":
         return 20
     else:
@@ -103,9 +106,6 @@ FOCUS = 20 * 60
 SHORT_BREAK = 7 * 60
 LONG_BREAK = 15 * 60
 
-global restart
-restart = False
-
 def sine(f):
     # Generate one period of sine wav.
     length = 8000 // f
@@ -115,112 +115,108 @@ def sine(f):
     sine_wave = RawSample(sine_wave, sample_rate=8000)
     return sine_wave
 
-def focus_session(length, ctr):
-    start = time.monotonic()
+# Fade animation
+class Fade:
+    def __init__(self, length, start=time.monotonic(), warning=15, color0=OLD_LACE, color1=BLUE):
+        self.start=start
+        self.length = length
+        self.warning=warning
+        self.color0=color0
+        self.color1=color1
 
-    rainbow = Rainbow(pixels, speed=0.1, period=length, precompute_rainbow=False)
-
-    while time.monotonic() < start + length:
-        rainbow.animate()
-        if switch.value:
-            check_temp()
-            check_light()
-            gc.collect()
-
-        if btnA.value: # restart
-            time.sleep(.5)
-            return True
-
-        if btnB.value: # skip to break
-            time.sleep(.5)
-            return False
-
-        if lis3dh.tapped:
-            print("Status check!")
-            for i in range(ctr+1):
-                pixels[i] = (255, 255, 255)
-            pixels.show()
-            time.sleep(1)
-    return False
-
-def rest(length, ctr=-1, color0=OLD_LACE, color1=BLUE):
-    start = time.monotonic()
-
-    while time.monotonic() < start + length:
+    def animate(self):
         intensity = .45*math.sin(1.25*time.monotonic())+.55
+
+        if time.monotonic() + self.warning < self.start + self.length:
+            pixels.fill(calculate_intensity(self.color0, intensity))
+        else:  # warn almost over
+            pixels.fill(calculate_intensity(self.color1, intensity))
+
+# Rainbow chase animation
+# Warning: does not support multi-tasking that changes neopixel display
+class RainbowChase:
+    def __init__(self, speed=.005):
+        self.speed=speed
+        self.j = 0
+
+    def animate(self):
+        for i in range(10):
+            start= time.monotonic()
+
+            rc_index = (i * 256 // 10) + self.j * 5
+            pixels[i] = colorwheel(rc_index & 255)
+
+            while time.monotonic() <= start + self.speed:
+                pixels.show()
+        self.j+=1
+        if self.j == 255:
+            self.j=0
+
+def session(length, anim, ctr=-1):
+    start = time.monotonic()
+    display_status = False # Boolean for status check
+
+    while time.monotonic() < start + length:
+        # Main display
+        anim.animate()
+
+        # Check sensors
         if switch.value:
             check_temp()
             check_light()
             gc.collect()
-
         if btnA.value: # restart
+            print("Go back to main!")
             time.sleep(.5)
             return True
-        if btnB.value: # restart break
+        if btnB.value: # skip ahead or add time
             time.sleep(.5)
-            start = time.monotonic()
+            if isinstance(anim, Fade):
+                print("Adding time to current session!")
+                start = time.monotonic()
+            else:
+                print("Skipping to next session!")
+                return False
         if lis3dh.tapped and ctr >= 0:
             print("Status check!")
-            for i in range(ctr+1):
-                pixels[i] = (255, 0, 0)
-            pixels.show()
-            time.sleep(2)
+            t = time.monotonic()
+            display_status = True
 
-        if time.monotonic() + 15 < start + length:
-            pixels.fill(calculate_intensity(color0, intensity))
-            pixels.show()
-        else:  # warn rest almost over
-            pixels.fill(calculate_intensity(color1, intensity))
-            pixels.show()
+        # Display status briefly if boolean set
+        if display_status:
+            if time.monotonic() >= t + 2:
+                display_status = False
+            else:
+                pixels[0:ctr+1] = [(255, 0, 0) if isinstance(anim, Fade)
+                else (255, 255, 255)]*(ctr+1)
+        pixels.show()
     return False
 
-def chasing_rainbow(length):
-    start = time.monotonic()
-
-    while time.monotonic() < start + length:
-        for j in range(255):
-            for i in range(10):
-                start_time = time.monotonic()
-
-                rc_index = (i * 256 // 10) + j * 5
-                pixels[i] = colorwheel(rc_index & 255)
-
-                while time.monotonic() <= start_time + length/2550:
-                    if switch.value:
-                        check_temp()
-                        check_light()
-                        gc.collect()
-
-                    if btnA.value: # restart
-                        time.sleep(.5)
-                        return True
-
-                    if btnB.value: # skip to break
-                        time.sleep(.5)
-                        return False
-
-                    pixels.show()
-    return False
-
-def session(focus = FOCUS, short_b = SHORT_BREAK, long_b = LONG_BREAK):
+def flow(focus = FOCUS, short_b = SHORT_BREAK, long_b = LONG_BREAK):
     for i in range(0,4):
-        if chasing_rainbow(5):
+
+        print("chasing rainbows")
+        chase = RainbowChase()
+        if session(length=10, anim=chase):
             return# restart
         gc.collect()
 
         print("starting focus session")
-        if focus_session(focus, i):
+        rainbow = Rainbow(pixels, speed=0.1, period=focus, precompute_rainbow=False)
+        if session(length=focus, anim=rainbow, ctr=i):
             return # restart
         gc.collect()
 
         if i < 3:
-            print("starting short break session")
-            if rest(length=short_b, ctr=i):
+            print("starting move session")
+            fade = Fade(length=short_b)
+            if session(length=short_b, anim=fade, ctr=i):
                 return # restart
             gc.collect()
         else:
-            print("starting long break session")
-            if rest(length=long_b, color0=BLUEISH, color1=PINKISH):
+            print("starting rest session")
+            fade = Fade(length=long_b, color0=BLUEISH, color1=PINKISH)
+            if session(length=long_b, anim=fade):
                 return # restart
             gc.collect()
 
@@ -266,9 +262,5 @@ while True:
 
     if btnA.value:
         time.sleep(.5)
-        session()
+        flow()
         gc.collect()
-
-
-
-
