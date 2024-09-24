@@ -169,7 +169,7 @@ def session(length, start, anim, ctr=-1):
             print("Go back to main!")
             time.sleep(.5)
             return True
-        if btnB.value: # skip ahead
+        if btnB.value: # skip ahead or add time
             time.sleep(.5)
             if isinstance(anim, Fade):
                 print("Adding time to current session!")
