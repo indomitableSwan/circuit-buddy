@@ -117,16 +117,15 @@ def sine(f):
 
 # Fade animation
 class Fade:
-    def __init__(self, length, start, color0=OLD_LACE, color1=BLUE):
-        self.start=start
+    def __init__(self, length, color0=OLD_LACE, color1=BLUE):
         self.length=length
         self.color0=color0
         self.color1=color1
 
-    def animate(self):
+    def animate(self, start):
         intensity = .45*math.sin(1.25*time.monotonic())+.55
 
-        if time.monotonic() + 15 < self.start + self.length:
+        if time.monotonic() + 15 < start + self.length:
             pixels.fill(calculate_intensity(self.color0, intensity))
         else:  # warn rest almost over
             pixels.fill(calculate_intensity(self.color1, intensity))
@@ -134,13 +133,12 @@ class Fade:
 # Rainbow chase animation
 # Warning: does not support multi-tasking that changes neopixel display
 class RainbowChase:
-    def __init__(self, length, start, j=0):
-        self.start=start
+    def __init__(self, length):
         self.length=length
-        self.j = j
+        self.j = 0
 
-    def animate(self):
-        if time.monotonic() < self.start + self.length:
+    def animate(self, start):
+        if time.monotonic() < start + self.length:
             for i in range(10):
                 start_time= time.monotonic()
 
@@ -153,12 +151,13 @@ class RainbowChase:
             if self.j == 255:
                 self.j=0
 
-def session(length, start, anim, ctr=-1):
+def session(length, anim, ctr=-1):
+    start = time.monotonic()
     display_status = False # Boolean for status check
 
     while time.monotonic() < start + length:
         # Main display
-        anim.animate()
+        anim.animate(start if not isinstance(anim, Rainbow) else True)
 
         # Check sensors
         if switch.value:
@@ -196,31 +195,27 @@ def flow(focus = FOCUS, short_b = SHORT_BREAK, long_b = LONG_BREAK):
     for i in range(0,4):
 
         print("chasing rainbows")
-        start = time.monotonic()
-        chase = RainbowChase(length=10, start=start)
-        if session(length=10, start=start, anim=chase):
+        chase = RainbowChase(length=10)
+        if session(length=10, anim=chase):
             return# restart
         gc.collect()
 
         print("starting focus session")
-        start = time.monotonic()
         rainbow = Rainbow(pixels, speed=0.1, period=focus, precompute_rainbow=False)
-        if session(length=focus, start=start, anim=rainbow, ctr=i):
+        if session(length=focus, anim=rainbow, ctr=i):
             return # restart
         gc.collect()
 
         if i < 3:
             print("starting move session")
-            start = time.monotonic()
-            fade = Fade(length=short_b, start=start)
-            if session(length=short_b, start=start, anim=fade, ctr=i):
+            fade = Fade(length=short_b)
+            if session(length=short_b, anim=fade, ctr=i):
                 return # restart
             gc.collect()
         else:
             print("starting rest session")
-            start = time.monotonic()
-            fade = Fade(length=long_b, start=start, color0=BLUEISH, color1=PINKISH)
-            if session(length=long_b, start=start, anim=fade):
+            fade = Fade(length=long_b, color0=BLUEISH, color1=PINKISH)
+            if session(length=long_b, anim=fade):
                 return # restart
             gc.collect()
 
