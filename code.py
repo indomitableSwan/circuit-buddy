@@ -194,17 +194,18 @@ def session(length, anim, ctr=-1):
 
 def flow(focus = FOCUS, short_b = SHORT_BREAK, long_b = LONG_BREAK):
     for i in range(0,4):
-
         print("chasing rainbows")
         chase = RainbowChase()
         if session(length=10, anim=chase):
             return# restart
+        del chase
         gc.collect()
 
         print("starting focus session")
         rainbow = Rainbow(pixels, speed=0.1, period=focus, precompute_rainbow=False)
         if session(length=focus, anim=rainbow, ctr=i):
             return # restart
+        del rainbow
         gc.collect()
 
         if i < 3:
@@ -212,12 +213,14 @@ def flow(focus = FOCUS, short_b = SHORT_BREAK, long_b = LONG_BREAK):
             fade = Fade(length=short_b)
             if session(length=short_b, anim=fade, ctr=i):
                 return # restart
+            del fade
             gc.collect()
         else:
             print("starting rest session")
             fade = Fade(length=long_b, color0=BLUEISH, color1=PINKISH)
             if session(length=long_b, anim=fade):
                 return # restart
+            del fade
             gc.collect()
 
 def check_temp():
@@ -250,6 +253,7 @@ def avg(arr):
         sum += v
     return sum/len(arr)
 
+gc.collect()
 while True:
     pixels.fill(JADE)
     pixels.show()
@@ -258,7 +262,7 @@ while True:
     if switch.value: # left is true
         check_temp()
         check_light()
-    gc.collect()
+        gc.collect()
 
     if btnA.value:
         time.sleep(.5)
