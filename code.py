@@ -33,10 +33,12 @@ import time
 import analogio
 import sys
 
-if sys.platform == "nRF52840":
+if sys.platform == "nRF52840": # CPBluefruit
     from audiopwmio import PWMAudioOut as AudioOut
-elif sys.platform == "Atmel SAMD21":
+elif sys.platform == "Atmel SAMD21": # CPExpress
     from audioio import AudioOut
+else:
+    raise Exception("Platform not recognized")
 
 gc.collect()
 
