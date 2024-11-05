@@ -221,8 +221,9 @@ def chasing_rainbow(length):
                     pixels.show()
     return False
 
-def session(focus = FOCUS, short_b = SHORT_BREAK, long_b = LONG_BREAK):
+def flow(focus = FOCUS, short_b = SHORT_BREAK, long_b = LONG_BREAK):
     for i in range(0,4):
+        print("chasing rainbows")
         if chasing_rainbow(5):
             return# restart
         gc.collect()
@@ -233,12 +234,12 @@ def session(focus = FOCUS, short_b = SHORT_BREAK, long_b = LONG_BREAK):
         gc.collect()
 
         if i < 3:
-            print("starting short break session")
+            print("starting move session")
             if rest(length=short_b, ctr=i):
                 return # restart
             gc.collect()
         else:
-            print("starting long break session")
+            print("starting rest session")
             if rest(length=long_b, color0=BLUEISH, color1=PINKISH):
                 return # restart
             gc.collect()
@@ -285,5 +286,5 @@ while True:
 
     if btnA.value:
         time.sleep(.5)
-        session()
+        flow()
         gc.collect()
