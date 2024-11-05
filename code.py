@@ -115,7 +115,7 @@ def sine(f):
     sine_wave = RawSample(sine_wave, sample_rate=8000)
     return sine_wave
 
-def focus_session(length, ctr):
+def focus_session(length, ctr=-1):
     start = time.monotonic()
 
     rainbow = Rainbow(pixels, speed=0.1, period=length, precompute_rainbow=False)
@@ -135,7 +135,7 @@ def focus_session(length, ctr):
             time.sleep(.5)
             return False
 
-        if lis3dh.tapped:
+        if lis3dh.tapped and ctr>=0:
             print("Status check!")
             for i in range(ctr+1):
                 pixels[i] = (255, 255, 255)
