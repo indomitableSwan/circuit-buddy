@@ -118,6 +118,10 @@ def sine(f):
 def focus_session(length, ctr=-1):
     start = time.monotonic()
 
+    # The time at which to stop displaying status
+    # Initialized to start since we only display after a tap
+    display_end = start
+
     rainbow = Rainbow(pixels, speed=0.1, period=length, precompute_rainbow=False)
 
     while time.monotonic() < start + length:
@@ -137,14 +141,19 @@ def focus_session(length, ctr=-1):
 
         if lis3dh.tapped and ctr>=0:
             print("Status check!")
-            for i in range(ctr+1):
-                pixels[i] = (255, 255, 255)
+            display_end = time.monotonic() + 2
+
+        if time.monotonic() <= display_end: # Display status if tap
+            pixels[0:ctr+1] = [(255,255,255)]*(ctr+1)
             pixels.show()
-            time.sleep(1)
     return False
 
 def rest(length, ctr=-1, color0=OLD_LACE, color1=BLUE):
     start = time.monotonic()
+
+    # The time at which to stop displaying status
+    # Initialized to start since we only display after a tap
+    display_end = start
 
     while time.monotonic() < start + length:
         intensity = .45*math.sin(1.25*time.monotonic())+.55
@@ -161,17 +170,25 @@ def rest(length, ctr=-1, color0=OLD_LACE, color1=BLUE):
             start = time.monotonic()
         if lis3dh.tapped and ctr >= 0:
             print("Status check!")
-            for i in range(ctr+1):
-                pixels[i] = (255, 0, 0)
-            pixels.show()
-            time.sleep(2)
+            display_end=time.monotonic() + 2
 
+        # Set fade colors
         if time.monotonic() + 15 < start + length:
-            pixels.fill(calculate_intensity(color0, intensity))
-            pixels.show()
-        else:  # warn rest almost over
-            pixels.fill(calculate_intensity(color1, intensity))
-            pixels.show()
+            if time.monotonic() <= display_end: # Display status if tap
+                pixels[0:ctr+1] = [(255,0,0)]*(ctr+1)
+                pixels[ctr+1::] = [calculate_intensity(color0, intensity)]*(len(pixels)-(ctr+1))
+            else:
+                pixels.fill(calculate_intensity(color0, intensity))
+
+        else:  # Change fade color when rest almost over
+            if time.monotonic() <= display_end: # Display status if tap
+                pixels[0:ctr+1] = [(255,0,0)]*(ctr+1)
+                pixels[ctr+1::] = [calculate_intensity(color1, intensity)]*(len(pixels)-(ctr+1))
+            else:
+                pixels.fill(calculate_intensity(color1, intensity))
+
+        pixels.show()
+
     return False
 
 def chasing_rainbow(length):
@@ -268,7 +285,3 @@ while True:
         time.sleep(.5)
         session()
         gc.collect()
-
-
-
-
