@@ -33,10 +33,12 @@ import time
 import analogio
 import sys
 
-if sys.platform == "nRF52840":
+if sys.platform == "nRF52840": # CPBluefruit
     from audiopwmio import PWMAudioOut as AudioOut
-elif sys.platform == "Atmel SAMD21":
+elif sys.platform == "Atmel SAMD21": # CPExpress
     from audioio import AudioOut
+else:
+    raise Exception("Platform not recognized")
 
 gc.collect()
 
@@ -73,7 +75,7 @@ lis3dh.range = adafruit_lis3dh.RANGE_8_G
 # higher values are less sensitive
 def threshold():
     if sys.platform == "nRF52840":
-        return 25
+        return 30
     elif sys.platform == "Atmel SAMD21":
         return 20
     else:
@@ -176,14 +178,14 @@ def rest(length, ctr=-1, color0=OLD_LACE, color1=BLUE):
         if time.monotonic() + 15 < start + length:
             if time.monotonic() <= display_end: # Display status if tap
                 pixels[0:ctr+1] = [(255,0,0)]*(ctr+1)
-                pixels[ctr+1::] = [calculate_intensity(color0, intensity)]*(len(pixels)-(ctr+1))
+                pixels[ctr+1::] = [calculate_intensity(color0, intensity)]*len(pixels[ctr+1::])
             else:
                 pixels.fill(calculate_intensity(color0, intensity))
 
         else:  # Change fade color when rest almost over
             if time.monotonic() <= display_end: # Display status if tap
                 pixels[0:ctr+1] = [(255,0,0)]*(ctr+1)
-                pixels[ctr+1::] = [calculate_intensity(color1, intensity)]*(len(pixels)-(ctr+1))
+                pixels[ctr+1::] = [calculate_intensity(color1, intensity)]*len(pixels[ctr+1::])
             else:
                 pixels.fill(calculate_intensity(color1, intensity))
 
@@ -219,8 +221,9 @@ def chasing_rainbow(length):
                     pixels.show()
     return False
 
-def session(focus = FOCUS, short_b = SHORT_BREAK, long_b = LONG_BREAK):
+def flow(focus = FOCUS, short_b = SHORT_BREAK, long_b = LONG_BREAK):
     for i in range(0,4):
+        print("chasing rainbows")
         if chasing_rainbow(5):
             return# restart
         gc.collect()
@@ -231,12 +234,12 @@ def session(focus = FOCUS, short_b = SHORT_BREAK, long_b = LONG_BREAK):
         gc.collect()
 
         if i < 3:
-            print("starting short break session")
+            print("starting move session")
             if rest(length=short_b, ctr=i):
                 return # restart
             gc.collect()
         else:
-            print("starting long break session")
+            print("starting rest session")
             if rest(length=long_b, color0=BLUEISH, color1=PINKISH):
                 return # restart
             gc.collect()
@@ -283,5 +286,5 @@ while True:
 
     if btnA.value:
         time.sleep(.5)
-        session()
+        flow()
         gc.collect()
