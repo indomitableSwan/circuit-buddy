@@ -75,7 +75,7 @@ lis3dh.range = adafruit_lis3dh.RANGE_8_G
 # higher values are less sensitive
 def threshold():
     if sys.platform == "nRF52840":
-        return 25
+        return 30
     elif sys.platform == "Atmel SAMD21":
         return 20
     else:
