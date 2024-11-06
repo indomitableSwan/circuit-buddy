@@ -178,14 +178,14 @@ def rest(length, ctr=-1, color0=OLD_LACE, color1=BLUE):
         if time.monotonic() + 15 < start + length:
             if time.monotonic() <= display_end: # Display status if tap
                 pixels[0:ctr+1] = [(255,0,0)]*(ctr+1)
-                pixels[ctr+1::] = [calculate_intensity(color0, intensity)]*(len(pixels)-(ctr+1))
+                pixels[ctr+1::] = [calculate_intensity(color0, intensity)]*len(pixels[ctr+1::])
             else:
                 pixels.fill(calculate_intensity(color0, intensity))
 
         else:  # Change fade color when rest almost over
             if time.monotonic() <= display_end: # Display status if tap
                 pixels[0:ctr+1] = [(255,0,0)]*(ctr+1)
-                pixels[ctr+1::] = [calculate_intensity(color1, intensity)]*(len(pixels)-(ctr+1))
+                pixels[ctr+1::] = [calculate_intensity(color1, intensity)]*len(pixels[ctr+1::])
             else:
                 pixels.fill(calculate_intensity(color1, intensity))
 
