@@ -40,7 +40,7 @@ There is currently no support built in for adjusting your settings from the defa
 # Setting up your device
 ## Dependencies
 -  adafruit_led_animation
--  adafruit_lis3dh
+-  adafruit_lis3dh.mpy
 -  neopixel.mpy
 -  adafruit_thermistor.mpy
 
