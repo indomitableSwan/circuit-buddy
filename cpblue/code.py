@@ -255,14 +255,20 @@ def check_temp():
         time.sleep(1)
         dac.stop()
 
+# light sensor readings as volts across resistor
+def analog_voltage(adc):
+    return adc.value/65335*adc.reference_voltage
+
 def check_light():
-    arr = array.array("H", [])
+    arr = array.array("f", [])
+
     for i in range(20):
-        arr.append(light.value)
+        arr.append(analog_voltage(light))
     v = avg(arr)
-    while v < 30000:
+
+    while v < env['dark']:
         if not switch.value:
-            print("light value is low:", v)
+            print("The room is too dark:", v)
             return
         pixels.fill(calculate_intensity(JADE, math.sin(1.25*time.monotonic())))
         pixels.show()
