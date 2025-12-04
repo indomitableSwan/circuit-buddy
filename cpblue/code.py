@@ -243,9 +243,13 @@ def flow(focus = lengths['focus'], short_b = lengths['short_break'], long_b = le
                 return # restart
             gc.collect()
 
+
+def fahrenheit(t):
+    return t*1.8+32
+
 def check_temp():
     temp_c = temp.temperature
-    temp_f = temp_c * 1.8 + 32
+    temp_f = fahrenheit(temp_c)
 
     while temp_f < 62 or temp_f > 90:
         if not switch.value:
