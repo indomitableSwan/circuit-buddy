@@ -141,7 +141,7 @@ def focus_session(length, ctr=-1):
             return False
 
         if lis3dh.tapped and ctr>=0:
-            print("Status check!")
+            status()
             display_end = time.monotonic() + 2
 
         if time.monotonic() <= display_end: # Display status if tap
@@ -170,7 +170,7 @@ def rest(length, ctr=-1, color0=OLD_LACE, color1=BLUE):
             time.sleep(.5)
             start = time.monotonic()
         if lis3dh.tapped and ctr >= 0:
-            print("Status check!")
+            status()
             display_end=time.monotonic() + 2
 
         # Set fade colors
@@ -243,6 +243,10 @@ def flow(focus = lengths['focus'], short_b = lengths['short_break'], long_b = le
                 return # restart
             gc.collect()
 
+def status():
+    print("Status check!")
+    print("temp:",fahrenheit(temp.temperature),"F")
+    print("light:",analog_voltage(light),"V")
 
 def fahrenheit(t):
     return t*1.8+32
