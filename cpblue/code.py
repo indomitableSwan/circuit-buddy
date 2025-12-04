@@ -100,10 +100,9 @@ BLUE = (0, 0, 255)
 OLD_LACE = (253, 245, 230)
 JADE= (0, 255, 40)
 
-# (sub)session lengths
-FOCUS = 20 * 60
-SHORT_BREAK = 7 * 60
-LONG_BREAK = 15 * 60
+# import (sub)session lenghts, env thresholds
+from config import lengths, env
+
 
 global restart
 restart = False
@@ -221,7 +220,7 @@ def chasing_rainbow(length):
                     pixels.show()
     return False
 
-def flow(focus = FOCUS, short_b = SHORT_BREAK, long_b = LONG_BREAK):
+def flow(focus = lengths['focus'], short_b = lengths['short_break'], long_b = lengths['long_break']):
     for i in range(0,4):
         print("chasing rainbows")
         if chasing_rainbow(5):
