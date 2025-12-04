@@ -255,7 +255,7 @@ def check_temp():
     temp_c = temp.temperature
     temp_f = fahrenheit(temp_c)
 
-    while temp_f < 62 or temp_f > 90:
+    while temp_f < env['cold'] or temp_f > env['hot']:
         if not switch.value:
             print("temp is", temp_f)
             return

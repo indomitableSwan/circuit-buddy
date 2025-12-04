@@ -8,7 +8,10 @@ env = {
     # light levels: Voltage across Resistor
     "dark": .5,
     "bright": 2,
-    "blinding": 3
+    "blinding": 3,
+    # temperature, Fahrenheit
+    "hot": 90,
+    "cold": 62
     }
 
 
